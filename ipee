@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# IPEE 0.1 20140923 copyright sk4zuzu@gmail.com 2014
+# IPEE 0.2 20150616 copyright sk4zuzu@gmail.com 2016
 #
 # This file is part of IPEE.
 #
@@ -29,75 +29,75 @@ new(){
     g=`echo ${a}|rev|cut -d. -f2-|rev`.69   # gateway address
     n=`echo ${a}|rev|cut -d. -f2-|rev`.0/24 # network address
 
-    echo "> create namespace (if needed)"
+    echo "> create namespace" # (if needed)
     ip netns list|grep ${u}|not \
         |xargs -r -i{} ip netns add ${u}
 
-    echo "> create new veth device pair (if needed)"
+    echo "> create new veth device pair" # (if needed)
     ip link list|grep ${u}a|not \
         |xargs -r -i{} ip link add ${u}a type veth peer name ${u}b
 
-    echo "> move the 'b' device to the new namespace (if needed)"
+    echo "> move the 'b' device to the new namespace" # (if needed)
     ip link list|grep ${u}b|notnot \
         |xargs -r -i{} ip link set ${u}b netns ${u}
 
-    echo "> prepare loopback address inside the new namespace (if needed)"
+    echo "> prepare loopback address inside the new namespace" # (if needed)
     ip netns exec ${u} \
     ip addr show lo|grep 127.0.0.1/8|not \
         |xargs -r -i{} ip netns exec ${u} \
                        ip addr add 127.0.0.1/8 dev lo
 
-    echo "> prepare 'b' device address inside the new namespace (if needed)"
+    echo "> prepare 'b' device address inside the new namespace" # (if needed)
     ip netns exec ${u} \
     ip addr list|grep -A4 ${u}b:|grep ${a}/24|not \
         |xargs -r -i{} ip netns exec ${u} \
                        ip addr add ${a}/24 brd ${b} dev ${u}b
 
-    echo "> create new bridge (if needed)"
+    echo "> create new bridge" # (if needed)
     ip link list|grep br0:|not \
         |xargs -r -i{} ip link add br0 type bridge
 
-    echo "> set ip address on the bridge (if needed)"
+    echo "> set ip address on the bridge" # (if needed)
     ip addr list|grep -A4 br0:|grep ${g}/24|not \
         |xargs -r -i{} ip addr add ${g}/24 brd ${b} dev br0
 
-    echo "> plug 'a' device into the bridge (if needed)"
+    echo "> plug 'a' device into the bridge" # (if needed)
     ip link list|grep ${u}:|grep br0|not \
         |xargs -r -i{} ip link set ${u}a master br0
 
-    echo "> bring the bridge up (if exists)"
+    echo "> bring the bridge up" # (if exists)
     ip link list|grep br0:|notnot \
         |xargs -r -i{} ip link set br0 up
 
-    echo "> bring the 'a' device up (if exists)"
+    echo "> bring the 'a' device up" # (if exists)
     ip link list|grep ${u}a:|notnot \
         |xargs -r -i{} ip link set ${u}a up
 
-    echo "> bring loopback device up inside the new namespace (if exists)"
+    echo "> bring loopback device up inside the new namespace" # (if exists)
     ip netns exec ${u} \
     ip link show lo|notnot \
         |xargs -r -i{} ip netns exec ${u} \
                        ip link set lo up
 
-    echo "> bring the 'b' device up inside the new namespace (if exists)"
+    echo "> bring the 'b' device up inside the new namespace" # (if exists)
     ip netns exec ${u} \
     ip link list|grep ${u}b:|notnot \
         |xargs -r -i{} ip netns exec ${u} \
                        ip link set ${u}b up
 
-    echo "> inject route for loopback device into the new namespace (if needed)"
+    echo "> inject route for loopback device into the new namespace" # (if needed)
     ip netns exec ${u} \
     ip route list|grep 127.0.0.0/8|not \
         |xargs -r -i{} ip netns exec ${u} \
                        ip route add 127.0.0.0/8 dev lo
 
-    echo "> inject default route into the new namespace (if needed)"
+    echo "> inject default route into the new namespace" # (if needed)
     ip netns exec ${u} \
     ip route list|grep default|not \
         |xargs -r -i{} ip netns exec ${u} \
                        ip route add default via ${g}
 
-    echo "> inject route for the new network into default namespace (if needed)"
+    echo "> inject route for the new network into default namespace" # (if needed)
     ip route list|grep ${n}|grep br0|not \
         |xargs -r -i{} ip route add ${n} dev br0
 }
