@@ -15,5 +15,9 @@ For instance you can try:
 
     sudo ip netns exec ns1 ping 10.2.11.22
 
+or
+
+    ns ns1
+
 to check if it is working.
 
