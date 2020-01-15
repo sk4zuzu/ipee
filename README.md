@@ -1,6 +1,8 @@
 ipee
 ========
 
+This is a kind of a joke project if you must really ask... <img src="https://emojipedia-us.s3.dualstack.us-west-1.amazonaws.com/thumbs/240/twitter/233/smiling-face-with-smiling-eyes-and-hand-covering-mouth_1f92d.png" alt="hihihi" width="69"/>
+
 Simple linux network namespace setup tool for not dealing with the lxc nightmares.
 
     sudo ipee ns1 10.2.11.11
@@ -21,3 +23,4 @@ or
 
 to check if it is working.
 
+[//]: # ( vim:set ts=2 sw=2 et syn=markdown: )
